@@ -4,16 +4,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -42,25 +38,40 @@ fun FocusPlanRoute(modifier: Modifier = Modifier) {
         mutableStateOf(null as FocusPlan?)
     }
 
+    var isDisplayCard by rememberSaveable {
+        mutableStateOf(false)
+    }
+
     val minutes: Int? = minutesText.toIntOrNull()
 
-    val canCreatePlan =
-        subject.isNotBlank() &&
-                minutes != null &&
-                minutes in 10..180
+    val isValidSubject = subject.isNotBlank()
+
+    val isValidMinutes = minutes != null && minutes in 10..180
+
+    val canCreatePlan = isValidSubject && isValidMinutes
 
     FocusPlanScreen(
         subject = subject,
         minutesText = minutesText,
         plan = focusPlan,
-        onSubjectChange = { subject = it },
-        onMinutesChange = { minutesText = it },
+        onSubjectChange = {
+            subject = it
+            isDisplayCard = false
+        },
+
+        onMinutesChange = {
+            minutesText = it
+            isDisplayCard = false
+        },
+        isValidMinutes = isValidMinutes,
         canCreatePlan = canCreatePlan,
         onCreatePlan = {
             val category = durationCategory(minutes ?: 0)
             val breakMinutes = recommendedBreak(minutes ?: 0)
             focusPlan = FocusPlan(subject, minutes, category, breakMinutes)
+            isDisplayCard = true
         },
+        isDisplayCard = isDisplayCard,
         modifier = modifier
     )
 }
@@ -71,8 +82,10 @@ fun FocusPlanScreen(subject: String,
                     plan: FocusPlan?,
                     onSubjectChange: (String) -> Unit,
                     onMinutesChange: (String) -> Unit,
+                    isValidMinutes: Boolean,
                     canCreatePlan: Boolean,
                     onCreatePlan: () -> Unit,
+                    isDisplayCard: Boolean,
                     modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
@@ -89,67 +102,24 @@ fun FocusPlanScreen(subject: String,
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        Text(
-            text = stringResource(R.string.app_description),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+        FocusPlanForm(
+            subject = subject,
+            minutesText = minutesText,
+            onSubjectChange = onSubjectChange,
+            onMinutesChange = onMinutesChange,
+            isValidMinutes = isValidMinutes,
+            canCreatePlan = canCreatePlan,
+            onCreatePlan = onCreatePlan,
+            modifier = modifier
         )
 
-        Column(
-            modifier = modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Text(
-                text = stringResource(R.string.study_subject_prompt),
-                style = MaterialTheme.typography.titleMedium
-            )
+        Spacer(modifier = Modifier.height(12.dp))
 
-            OutlinedTextField(
-                value = subject,
-                onValueChange = onSubjectChange,
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text(stringResource(R.string.study_subject_label)) },
-                placeholder = { Text(stringResource(R.string.study_subject_placeholder)) },
-                singleLine = true
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Text(
-                text = stringResource(R.string.session_duration_prompt),
-                style = MaterialTheme.typography.titleMedium
-            )
-
-            OutlinedTextField(
-                value = minutesText,
-                onValueChange = onMinutesChange,
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text(stringResource(R.string.session_duration_label)) },
-                placeholder = { Text(stringResource(R.string.session_duration_placeholder)) },
-                singleLine = true
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Button(
-                onClick = onCreatePlan,
-                modifier = Modifier.fillMaxWidth(),
-                enabled = canCreatePlan
-            ) {
-                Text(stringResource(R.string.create_plan_button))
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Card(modifier = modifier.fillMaxWidth()) {
-                Column(
-                    modifier = Modifier.padding(20.dp),
-                    verticalArrangement = Arrangement.spacedBy(14.dp)
-                ) {
-
-                }
-            }
-        }
+        FocusPlanCard(
+            plan = plan,
+            isDisplayCard = isDisplayCard,
+            modifier = modifier
+        )
     }
 }
 

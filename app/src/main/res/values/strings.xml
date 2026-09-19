@@ -8,5 +8,11 @@
     <string name="session_duration_prompt">Duration for the session:</string>
     <string name="session_duration_label">Session duration</string>
     <string name="session_duration_placeholder">Enter session duration</string>
+    <string name="session_duration_error">Error: Session duration must be a number between 10 and 180 minutes</string>">
+    <string name="focus_plan_card_title">Focus Plan</string>">
+    <string name="focus_plan_duration_label">Duration: %1s minutes</string>">
+    <string name="focus_plan_category_label">Category: %1s</string>">
+    <string name="focus_plan_break_minutes_label">Recommended Break: %1s minutes</string>">
+    <string name="focus_plan_card_summary">Study %1$s for %2$s minutes, and then take a %3$s-minute break.</string>
     <string name="create_plan_button">Create focus plan</string>">
 </resources>
