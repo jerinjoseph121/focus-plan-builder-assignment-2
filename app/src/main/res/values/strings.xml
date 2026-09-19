@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">Focus_Plan_Builder</string>
+    <string name="app_title">Focus Plan Builder</string>
+    <string name="app_description">Enter the study subject and available minutes to generate the focus plan</string>
+    <string name="study_subject_prompt">Study subject for the session:</string>
+    <string name="study_subject_label">Study subject</string>
+    <string name="study_subject_placeholder">Enter study subject</string>
+    <string name="session_duration_prompt">Duration for the session:</string>
+    <string name="session_duration_label">Session duration</string>
+    <string name="session_duration_placeholder">Enter session duration</string>
+    <string name="create_plan_button">Create focus plan</string>">
 </resources>

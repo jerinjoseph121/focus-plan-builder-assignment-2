@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
-import com.jerinjoseph.focus_plan_builder.ui.FocusPlanScreen
+import com.jerinjoseph.focus_plan_builder.ui.FocusPlanRoute
 import com.jerinjoseph.focus_plan_builder.ui.theme.Focus_Plan_BuilderTheme
 
 class MainActivity : ComponentActivity() {
@@ -18,7 +18,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             Focus_Plan_BuilderTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    FocusPlanScreen(
+                    FocusPlanRoute(
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
