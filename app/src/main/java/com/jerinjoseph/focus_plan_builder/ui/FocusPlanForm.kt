@@ -14,6 +14,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.jerinjoseph.focus_plan_builder.R
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardType
 
 @Composable
 fun FocusPlanForm(subject: String,
@@ -24,16 +26,16 @@ fun FocusPlanForm(subject: String,
                   canCreatePlan: Boolean,
                   onCreatePlan: () -> Unit,
                   modifier: Modifier = Modifier) {
-    Text(
-        text = stringResource(R.string.app_description),
-        style = MaterialTheme.typography.bodyMedium,
-        color = MaterialTheme.colorScheme.onSurfaceVariant
-    )
-
     Column(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
+        Text(
+            text = stringResource(R.string.app_description),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+
         Text(
             text = stringResource(R.string.study_subject_prompt),
             style = MaterialTheme.typography.titleMedium
@@ -61,14 +63,17 @@ fun FocusPlanForm(subject: String,
             modifier = Modifier.fillMaxWidth(),
             label = { Text(stringResource(R.string.session_duration_label)) },
             placeholder = { Text(stringResource(R.string.session_duration_placeholder)) },
-            singleLine = true
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            supportingText = { Text(stringResource(R.string.session_duration_supporting_text)) },
+            isError = !isValidMinutes && minutesText.isNotBlank(),
         )
 
         if (!isValidMinutes && minutesText.isNotBlank()) {
             Text(
                 text = stringResource(R.string.session_duration_error),
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onErrorContainer
+                color = MaterialTheme.colorScheme.error
             )
         }
 

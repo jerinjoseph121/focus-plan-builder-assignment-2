@@ -2,9 +2,7 @@ package com.jerinjoseph.focus_plan_builder.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -14,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -22,6 +21,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jerinjoseph.focus_plan_builder.R
 import com.jerinjoseph.focus_plan_builder.model.FocusPlan
+import com.jerinjoseph.focus_plan_builder.model.durationCategory
+import com.jerinjoseph.focus_plan_builder.model.recommendedBreak
 import com.jerinjoseph.focus_plan_builder.ui.theme.Focus_Plan_BuilderTheme
 
 @Composable
@@ -34,12 +35,8 @@ fun FocusPlanRoute(modifier: Modifier = Modifier) {
         mutableStateOf("")
     }
 
-    var focusPlan by rememberSaveable {
+    var focusPlan by remember {
         mutableStateOf(null as FocusPlan?)
-    }
-
-    var isDisplayCard by rememberSaveable {
-        mutableStateOf(false)
     }
 
     val minutes: Int? = minutesText.toIntOrNull()
@@ -56,22 +53,22 @@ fun FocusPlanRoute(modifier: Modifier = Modifier) {
         plan = focusPlan,
         onSubjectChange = {
             subject = it
-            isDisplayCard = false
+            focusPlan = null
         },
 
         onMinutesChange = {
             minutesText = it
-            isDisplayCard = false
+            focusPlan = null
         },
         isValidMinutes = isValidMinutes,
         canCreatePlan = canCreatePlan,
         onCreatePlan = {
-            val category = durationCategory(minutes ?: 0)
-            val breakMinutes = recommendedBreak(minutes ?: 0)
-            focusPlan = FocusPlan(subject, minutes, category, breakMinutes)
-            isDisplayCard = true
+            if (minutes != null) {
+                val category = durationCategory(minutes)
+                val breakMinutes = recommendedBreak(minutes)
+                focusPlan = FocusPlan(subject.trim(), minutes, category, breakMinutes)
+            }
         },
-        isDisplayCard = isDisplayCard,
         modifier = modifier
     )
 }
@@ -85,7 +82,6 @@ fun FocusPlanScreen(subject: String,
                     isValidMinutes: Boolean,
                     canCreatePlan: Boolean,
                     onCreatePlan: () -> Unit,
-                    isDisplayCard: Boolean,
                     modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
@@ -100,8 +96,6 @@ fun FocusPlanScreen(subject: String,
             style = MaterialTheme.typography.headlineLarge
         )
 
-        Spacer(modifier = Modifier.height(12.dp))
-
         FocusPlanForm(
             subject = subject,
             minutesText = minutesText,
@@ -110,37 +104,33 @@ fun FocusPlanScreen(subject: String,
             isValidMinutes = isValidMinutes,
             canCreatePlan = canCreatePlan,
             onCreatePlan = onCreatePlan,
-            modifier = modifier
+            modifier = Modifier
         )
 
-        Spacer(modifier = Modifier.height(12.dp))
-
-        FocusPlanCard(
-            plan = plan,
-            isDisplayCard = isDisplayCard,
-            modifier = modifier
-        )
+        if (plan != null) {
+            FocusPlanCard(
+                plan = plan,
+                modifier = Modifier
+            )
+        }
     }
-}
-
-fun durationCategory(minutes: Int): String = when {
-    minutes < 10 -> "Invalid"
-    minutes in 10..29 -> "Quick review"
-    minutes in 30..60 -> "Focused session"
-    else -> "Extended session"
-}
-
-fun recommendedBreak(minutes: Int): Int = when (minutes) {
-    in 10..29 -> 5
-    in 30..60 -> 10
-    else -> 15
 }
 
 @Preview(showBackground = true)
 @Composable
 fun FocusPlanScreenPreview() {
     Focus_Plan_BuilderTheme {
-        FocusPlanRoute()
+        val focusPlan = FocusPlan("Android Development", 45, "Focused Session", 10)
+        FocusPlanScreen(
+            subject = focusPlan.subject,
+            minutesText = focusPlan.minutes.toString(),
+            plan = focusPlan,
+            onSubjectChange = {},
+            onMinutesChange = {},
+            isValidMinutes = true,
+            canCreatePlan = true,
+            onCreatePlan = {}
+        )
     }
 }
 
